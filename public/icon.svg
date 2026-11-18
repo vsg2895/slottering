@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 42">
+  <!-- Slottering mark: the three REELS from Logo.tsx — a slot machine reduced
+       to its three windows, each with an ink pip, on the orange tile this
+       site borders everything with.
+
+       The 3px ink stroke is the site's own border at logo size, and it is what
+       keeps the tile legible on a pale browser tab; without it the orange
+       floats. It is drawn INSIDE the viewBox (x/y 1.5, 39x39) so the stroke is
+       not clipped in half at the edges.
+
+       The first <rect fill> is read by app/apple-icon.tsx as the background
+       plate, so it must stay the first element. src/app/favicon.ico is the
+       same artwork rasterised at 16/32/48 — see scripts/make-favicon.py. -->
+  <rect x="1.5" y="1.5" width="39" height="39" rx="10" fill="#ff5a1f" stroke="#1c1a17" stroke-width="3"/>
+  <rect x="8" y="12" width="7" height="18" rx="2" fill="#fff3d6"/>
+  <rect x="17.5" y="12" width="7" height="18" rx="2" fill="#fff3d6"/>
+  <rect x="27" y="12" width="7" height="18" rx="2" fill="#fff3d6"/>
+  <circle cx="11.5" cy="21" r="2" fill="#1c1a17"/>
+  <circle cx="21" cy="21" r="2" fill="#1c1a17"/>
+  <circle cx="30.5" cy="21" r="2" fill="#1c1a17"/>
+</svg>

@@ -1,0 +1,597 @@
+/* Slottering — from sites/slottering.html. That file is FOUR layers deep; read
+   the LAST one — the block headed "Slottering — neo-brutalist", plus the
+   "casino cards v2" and "bonus coupons v2" blocks after it. They override
+   everything above them.
+   The three earlier layers are the design's history, not its result.
+
+   THE LOOK IS NEO-BRUTALIST. One device carries the whole site: a 3px ink
+   border with a HARD OFFSET SHADOW (`6px 6px 0`, never a blur), and a press
+   that moves the element toward the shadow. Everything else follows from it —
+   cream page under a fixed dot grid, uppercase display type, flat fills in
+   four colours, no gradients.
+
+   Two consequences worth stating, because they are what a re-skin gets wrong:
+
+   1. `--color-line` IS THE INK. On the sibling sites a line is a hairline grey;
+      here a border is a 3px black rule and a structural part of the design. A
+      "subtle" border on this site is wrong, not softer. `--color-line-soft` is
+      the one genuinely quiet rule (empty stars, a divider inside a card).
+   2. SHADOWS ARE OPAQUE INK, never rgba blur. `box-shadow: 6px 6px 0` is the
+      design. A blurred shadow reads as a different site.
+
+   CONTRAST — three values from the mockup do not pass and are not shipped as
+   drawn (all ratios measured against this page's own grounds):
+
+   - ORANGE #FF5A1F carries WHITE at 3.12:1. The mockup's primary button does
+     exactly that. White sits on `--color-brand-btn` (#C8380B, 5.22:1) instead,
+     the same fix partnerplaypro's `brand-btn` makes. #FF5A1F stays everywhere
+     it is a FILL or an EDGE under ink, where it is 5.57:1.
+   - ORANGE as TEXT on the cream page is 2.83:1 — never used. Link and label
+     text takes `--color-brand-dark` (#A52B05, 6.46:1 on cream).
+   - TEAL #00A39A carries WHITE at 3.13:1. The mockup's eyebrow does that too.
+     Teal only ever carries INK here (5.54:1); `--color-accent-dark` (#00776F)
+     is the teal that may carry white (5.43:1) and may be text on cream (4.92:1).
+
+   STARS ARE INK on this site, not gold — the mockup's own `--star:#1C1A17`.
+   `--color-gold` is the amber FILL (#FFC24B) behind ink: 10.81:1 under ink,
+   1.61:1 under white, so it never carries a letter of white text.
+
+   TOKEN NAMES are identical to the sibling sites (cream/paper/ink/brand/…) so
+   every shared component works here unchanged — only the values differ. */
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  --background: #fff3d6;
+  --foreground: #1c1a17;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* The mockup's --bg / --surface / --surface-2. */
+  --color-cream: #fff3d6;
+  --color-paper: #ffffff;
+  /* The deeper amber band: a tab's hover, the FAQ plus-mark, the rank plate. */
+  --color-surface: #ffe7ae;
+
+  --color-ink: #1c1a17;
+  --color-ink-soft: #3f3a33;
+  --color-muted: #6b6358;
+  /* On this site `faint` is NOT lighter than muted. The page ground is cream,
+     and the mockup's footer grey (#8E97AA) is 2.3:1 on it — fine on the near
+     black footer, invisible here. Small print therefore holds at the muted
+     value (5.36:1 on cream, 5.91:1 on paper); the footer grey lives on as
+     --color-night-muted, where it belongs. */
+  --color-faint: #6b6358;
+
+  /* Orange. `brand` is the FILL and the EDGE — it never carries white text.
+     `brand-btn` is the one step deeper that does (5.22:1), `brand-dark` the
+     text/hover value that reads on cream (6.46:1). */
+  --color-brand: #ff5a1f;
+  --color-brand-btn: #c8380b;
+  --color-brand-dark: #a52b05;
+  --color-brand-soft: #ffe0d2;
+  --color-brand-tint: #ffe0d2;
+  --color-brand-ink: #ffffff;
+
+  /* Teal is the accent: the eyebrow, the leader's shadow partner, the score
+     pill, the open-FAQ mark. It carries INK, never white. */
+  --color-accent: #00a39a;
+  --color-accent-dark: #00776f;
+  --color-accent-ink: #1c1a17;
+
+  /* The border IS the design — 3px of ink. `line-soft` is the only quiet rule
+     on the site: an empty star, a divider inside an already-bordered box. */
+  --color-line: #1c1a17;
+  --color-line-soft: #c9c1b0;
+
+  /* The dark ramp — the footer, the top-three card, the casino card's head
+     band and the mobile menu. Near black, warm, the same ink as every border. */
+  --color-navy: #1c1a17;
+  --color-navy-2: #3f3a33;
+  --color-night-ink: #f3ebdd;
+  --color-night-muted: #a69c8e;
+  --color-night-faint: #a69c8e;
+  --color-night-line: #3f3a33;
+  --color-night-accent: #00a39a;
+
+  /* Amber. A FILL under ink and nothing else — see the note above. */
+  --color-gold: #ffc24b;
+  /* The factual region chips: the mockup's --good pair. */
+  --color-win: #005a54;
+  --color-win-bg: #d2f1ee;
+  --color-signal: #005a54;
+
+  --font-sans: var(--font-rubik);
+  --font-display: var(--font-chakra);
+  --font-mono: var(--font-rubik);
+
+  /* Squared, not round, and not sharp either: 18px on a card, which is what
+     the mockup's final layer settles on. */
+  --radius-card: 18px;
+}
+
+/* The page ground: a fixed dot grid under a cream veil, so the dots read as
+   texture rather than as content and never scroll with the page. `-z-10` on a
+   fixed pseudo-element rather than a background-attachment trick, which iOS
+   Safari does not honour. */
+body {
+  background-color: var(--background);
+  background-image: radial-gradient(var(--color-ink) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--foreground);
+  font-family: var(--font-rubik), system-ui, Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 243, 214, 0.9);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Every heading. Chakra Petch is a squared display face; the mockup sets all
+   of h1/h2/h3 in UPPERCASE at 700, which is its top weight — there is no 800,
+   so `font-bold` is the ceiling and `font-extrabold` would silently synthesise. */
+.font-display {
+  font-family: var(--font-chakra), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+
+:focus-visible {
+  outline-color: var(--color-brand-dark);
+}
+
+/* ── The live dot ───────────────────────────────────────────────────────────
+   The one piece of looping motion on the site, and it stops under
+   prefers-reduced-motion. `currentColor` so it reads on the teal eyebrow
+   (ink dot) and on a dark panel (teal dot) without a second rule. */
+.live::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .live::before {
+    animation: sl-beat 1.6s ease-out infinite;
+  }
+}
+@keyframes sl-beat {
+  0% {
+    box-shadow: 0 0 0 0 rgba(28, 26, 23, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(28, 26, 23, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(28, 26, 23, 0);
+  }
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────
+   The site's signature, and the reason these are classes rather than
+   utilities: they are UNLAYERED, so they beat anything Tailwind puts in
+   `@layer utilities`. A `bg-white` on the element would lose — which is why
+   the variants below exist as their own classes too.
+
+   Set in the display face, uppercase and tracked out: this is the one place
+   the mockup spends letter-spacing, and the buttons are short enough to
+   afford it. The press is physical — hover lifts away from the shadow,
+   :active drops into it. */
+.btn-or,
+.btn-ln {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2.5px solid var(--color-ink);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  font-family: var(--font-chakra), system-ui, sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  transition: transform 0.12s, box-shadow 0.12s, background-color 0.15s, color 0.15s;
+}
+.btn-or:hover,
+.btn-ln:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+.btn-or:active,
+.btn-ln:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 var(--color-ink);
+}
+.btn-or {
+  /* NOT --color-brand: white on #FF5A1F is 3.12:1. See the header note. */
+  background: var(--color-brand-btn);
+  color: #fff;
+}
+.btn-or:hover {
+  background: var(--color-brand-dark);
+  color: #fff;
+}
+.btn-ln {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.btn-ln:hover {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* The amber button, for the teal newsletter band where an orange one would
+   fight the ground. Amber carries ink only. */
+.btn-gold {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+.btn-gold:hover {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+/* On the near-black panels: paper ground, ink text, so the press still reads
+   against the dark. */
+.btn-on-dark {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.btn-on-dark:hover {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+/* ── The hard-edged box ───────────────────────────────────────────────────
+   `.slab` is the shared primitive: 3px of ink and an opaque offset shadow.
+   `.hard-gold` is the same box with the shadow in ORANGE, which is how the
+   mockup marks the two things that lead — the hero's top-three card and the
+   first casino card. */
+.slab {
+  border: 3px solid var(--color-ink);
+  border-radius: 20px;
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+.hard-gold {
+  box-shadow: 8px 8px 0 var(--color-brand);
+}
+
+/* The near-black panel the top three and the footer sit on. */
+.deep-panel {
+  background: var(--color-navy);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────
+   Casino cards, offer coupons and the FAQ rows share one treatment: the hard
+   box, and a lift toward the viewer on hover that grows the shadow. The FIRST
+   casino card takes the ORANGE shadow rather than a rank numeral — this
+   network prints no rank numbers on a casino card, and the mockup's `#01`
+   plate is not shipped. */
+.rw,
+.offer {
+  background: var(--color-paper);
+  border: 3px solid var(--color-ink);
+  box-shadow: 6px 6px 0 var(--color-ink);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.rw:hover,
+.rw:focus-within,
+.offer:hover,
+.offer:focus-within {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 var(--color-ink);
+}
+/* The leader. Driven by a CLASS, not `:first-child`: page 2 of /casinos has a
+   first child too, and it is the 26th casino — a positional selector would
+   have marked it as the top pick. The card gets `.rw-top` only when its rank
+   is actually 1, which is the same condition that flags its head band. */
+.rw-top {
+  background: #fff9ea;
+  box-shadow: 6px 6px 0 var(--color-brand);
+}
+.rw-top:hover,
+.rw-top:focus-within {
+  box-shadow: 9px 9px 0 var(--color-brand);
+}
+
+/* ── The bonus coupon ────────────────────────────────────────────────────
+   An offer card's head takes one of three fills by position — rhythm, not
+   meaning, which is why a `:nth-child` cycle is right here and wrong on the
+   bonus types (hiding one there would repaint the rest).
+
+   ALL THREE CARRY INK. The mockup puts white on the orange and the teal, and
+   both land near 3.1:1 — a pass for the 30px figure alone, a fail for the
+   12px label beside it. Ink is 5.5:1 or better on all three fills.
+
+   The notches are two circles in the PAGE colour straddling the tear line.
+   The card clips them (`overflow-hidden`, which the rounded head needs
+   anyway), so each shows as the half-circle a punched coupon leaves. */
+.coupon-grid > *:nth-child(3n + 1) .coupon-head {
+  background: var(--color-brand);
+}
+.coupon-grid > *:nth-child(3n + 2) .coupon-head {
+  background: var(--color-accent);
+}
+.coupon-grid > *:nth-child(3n + 3) .coupon-head {
+  background: var(--color-gold);
+}
+/* Outside a coupon grid — a casino page's offer list — the head still needs a
+   fill, and amber is the one that carries the most text safely. */
+.coupon-head {
+  background: var(--color-gold);
+}
+.coupon-stub::before,
+.coupon-stub::after {
+  content: '';
+  position: absolute;
+  top: -15px;
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--color-ink);
+  border-radius: 50%;
+  background: var(--color-cream);
+}
+.coupon-stub::before {
+  left: -14px;
+}
+.coupon-stub::after {
+  right: -14px;
+}
+
+/* ── Offer rows inside a group card ────────────────────────────────────── */
+.of {
+  transition: background-color 0.15s;
+}
+.of:hover,
+.of:focus-within {
+  background-color: var(--color-surface);
+}
+
+/* ── Bonus-type cells ───────────────────────────────────────────────────
+   The mockup's final `.btype`: a hard box whose FILL cycles through the
+   palette by position, so a row of types reads as a block of colour. The
+   cycle is driven from the markup (`data-tone`), not `:nth-child`, because
+   the grid's source order is the API's and a CSS-only cycle would renumber
+   itself whenever a type was hidden.
+
+   Every tone carries INK except the two dark ones, which name their own
+   text colour — teal and orange both fail under white (see the header). */
+.btype {
+  border: 3px solid var(--color-ink);
+  box-shadow: 5px 5px 0 var(--color-ink);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.btype:hover,
+.btype:focus-visible {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--color-ink);
+}
+.btype[data-tone='0'] {
+  background: var(--color-brand);
+  color: var(--color-ink);
+}
+.btype[data-tone='1'] {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+.btype[data-tone='2'] {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+.btype[data-tone='3'] {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.btype[data-tone='4'] {
+  background: var(--color-navy);
+  color: var(--color-night-ink);
+}
+.btype[data-tone='5'] {
+  background: #ffb3c7;
+  color: var(--color-ink);
+}
+
+/* ── Category tabs ───────────────────────────────────────────────────────
+   A squared tab inside one bordered group; the current one fills ink with its
+   count in orange. The group itself is a hard box. */
+.tab {
+  transition: background-color 0.15s, color 0.15s;
+}
+.tab:hover {
+  background-color: var(--color-surface);
+}
+
+/* ── Method steps ────────────────────────────────────────────────────────── */
+.step {
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.step:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rw,
+  .offer,
+  .of,
+  .btype,
+  .tab,
+  .step,
+  .btn-or,
+  .btn-ln {
+    transition: none;
+  }
+  .rw:hover,
+  .rw:focus-within,
+  .offer:hover,
+  .offer:focus-within,
+  .btype:hover,
+  .step:hover,
+  .btn-or:hover,
+  .btn-ln:hover,
+  .btn-or:active,
+  .btn-ln:active {
+    transform: none;
+  }
+}
+
+/* ── Responsive safety net (all phones / tablets / laptops / large screens) ── */
+html {
+  -webkit-text-size-adjust: 100%; /* no iOS text auto-inflation on rotate */
+}
+body {
+  overflow-x: clip; /* never scroll the page sideways; safe with the sticky header */
+}
+
+/* Hide the scrollbar on horizontally-scrollable rows (e.g. the mobile nav). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scraped HTML content (casino / offer descriptions) must stay in its column
+   on small screens: wrap long words, cap media width, scroll wide tables. */
+.prose {
+  overflow-wrap: break-word;
+}
+
+/* ── Prose colours ──────────────────────────────────────────────────────────
+   Pinned to this site's own tokens rather than left to the typography plugin's
+   defaults. Its link blue belongs to no part of this palette, and its neutral
+   greys are cold against this warm cream. Links take `brand-dark`, not
+   `brand`: orange on cream is 2.83:1.
+
+   `prose-invert` must NOT be used on this site — it would swap in the dark
+   palette the siblings need. The invert variables are given the same values
+   anyway, so a stray class degrades to "correct" instead of to unreadable. */
+.prose {
+  --tw-prose-body: var(--color-ink-soft);
+  --tw-prose-headings: var(--color-ink);
+  --tw-prose-lead: var(--color-muted);
+  --tw-prose-links: var(--color-brand-dark);
+  --tw-prose-bold: var(--color-ink);
+  --tw-prose-counters: var(--color-muted);
+  --tw-prose-bullets: var(--color-line-soft);
+  --tw-prose-hr: var(--color-line);
+  --tw-prose-quotes: var(--color-ink);
+  --tw-prose-quote-borders: var(--color-brand);
+  --tw-prose-captions: var(--color-faint);
+  --tw-prose-code: var(--color-ink);
+  --tw-prose-pre-code: var(--color-ink-soft);
+  --tw-prose-pre-bg: var(--color-surface);
+  --tw-prose-th-borders: var(--color-line-soft);
+  --tw-prose-td-borders: var(--color-line);
+  --tw-prose-invert-body: var(--color-ink-soft);
+  --tw-prose-invert-headings: var(--color-ink);
+  --tw-prose-invert-lead: var(--color-muted);
+  --tw-prose-invert-links: var(--color-brand-dark);
+  --tw-prose-invert-bold: var(--color-ink);
+  --tw-prose-invert-counters: var(--color-muted);
+  --tw-prose-invert-bullets: var(--color-line-soft);
+  --tw-prose-invert-hr: var(--color-line);
+  --tw-prose-invert-quotes: var(--color-ink);
+  --tw-prose-invert-quote-borders: var(--color-brand);
+  --tw-prose-invert-captions: var(--color-faint);
+  --tw-prose-invert-code: var(--color-ink);
+  --tw-prose-invert-pre-code: var(--color-ink-soft);
+  --tw-prose-invert-pre-bg: var(--color-surface);
+  --tw-prose-invert-th-borders: var(--color-line-soft);
+  --tw-prose-invert-td-borders: var(--color-line);
+}
+
+/* And the colours again, directly on the elements.
+   The variables above are the plugin's own mechanism, and they do work — but
+   they route through two indirections, and any link in that chain going
+   missing lands an unstyled heading on this ground. These rules do not depend
+   on the chain at all. `:where()` keeps specificity at zero, exactly as the
+   plugin does, so a utility class on the element still wins. */
+.prose {
+  color: var(--color-ink-soft);
+}
+.prose :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--color-ink);
+  font-family: var(--font-chakra), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+.prose :where(strong, b, th, dt) {
+  color: var(--color-ink);
+}
+.prose :where(a) {
+  color: var(--color-brand-dark);
+}
+.prose :where(li)::marker,
+.prose :where(ol > li)::marker {
+  color: var(--color-line-soft);
+}
+.prose :where(blockquote) {
+  color: var(--color-ink);
+  border-inline-start-color: var(--color-brand);
+}
+.prose :where(hr) {
+  border-color: var(--color-line);
+}
+.prose :where(code) {
+  color: var(--color-ink);
+}
+.prose :where(img, video, iframe) {
+  max-width: 100%;
+  height: auto;
+}
+.prose :where(table) {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+.prose :where(pre) {
+  overflow-x: auto;
+}
+
+/* ── Touch readability floor (phones and tablets, ≤1024px) ──
+   `text-xs` is 12px on desktop, where it suits eyebrow labels and footer
+   meta, but 12px body-ish text on a phone fails the 14px readability floor;
+   raise it to 14px there. Form fields go to 16px because iOS Safari zooms the
+   whole page when a smaller field takes focus. Width-based rather than
+   `pointer: coarse` on purpose: an iPad in a desktop-class browser reports a
+   fine pointer and would be missed. Unlayered on purpose so it wins over the
+   `@layer utilities` Tailwind classes regardless of source order. */
+@media (max-width: 1024px) {
+  .text-xs,
+  .sm\:text-xs,
+  .md\:text-xs,
+  .lg\:text-xs,
+  /* The LITERAL sizes this design uses for eyebrows, kickers, column labels
+     and chips. The `.text-xs` list above was the whole rule until 2026-11-18,
+     and it missed every one of these: an arbitrary-value utility is its own
+     class, so `text-[12.5px]` was never covered and the hero eyebrow, the
+     section kickers and the top-three column heading all shipped at 12-13px
+     on a phone — under the 14px floor this rule exists to enforce. */
+  .text-\[10\.5px\],
+  .text-\[11px\],
+  .text-\[12px\],
+  .text-\[12\.5px\],
+  .text-\[13px\],
+  .text-\[13\.5px\] {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+}
