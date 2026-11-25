@@ -140,7 +140,7 @@ export default function CasinoCard({
       {/* The welcome bonus on the mockup's amber panel. Dropped entirely when
           the operator has none. Amber carries INK, never white (1.61:1). */}
       {casino.bonuses && (
-        <div className="mx-5 rounded-[14px] border-[2.5px] border-line bg-gold px-4 py-3.5">
+        <div className="mx-5 mb-5 rounded-[14px] border-[2.5px] border-line bg-gold px-4 py-3.5">
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink-soft">Welcome bonus</p>
           <p className="mt-1 font-display text-[20px] leading-[1.15] text-ink [overflow-wrap:anywhere]">
             {casino.bonuses}
@@ -149,7 +149,7 @@ export default function CasinoCard({
       )}
 
       {shownRegions.length > 0 && (
-        <ul className="flex flex-wrap gap-1.5 px-5 pt-3.5" aria-label="Accepts players from">
+        <ul className="flex flex-wrap gap-1.5 px-5 pb-5" aria-label="Accepts players from">
           {shownRegions.map((country) => (
             <li key={country.id} className="rounded-full border-2 border-line bg-win-bg px-[11px] py-[3px] text-xs font-semibold text-win">
               {country.name}
@@ -166,7 +166,15 @@ export default function CasinoCard({
       )}
 
       {/* `mt-auto` so every card in a row ends on its buttons whatever length
-          the name, the bonus and the chip list run to. */}
+          the name, the bonus and the chip list run to.
+
+          IT IS NOT THE GAP ABOVE THE RULE, and it used to be the only thing
+          supplying one. `mt-auto` is whatever slack the card has left, so it
+          is generous on a short card and EXACTLY ZERO on the tallest card in
+          its row — which put the region chips hard against the dashed rule on
+          precisely the card a reader looks at first. The gap now belongs to
+          the content above (the bonus panel's `mb-5`, the chip list's `pb-5`),
+          so 20px is the floor and `mt-auto` only ever adds to it. */}
       <div className="mt-auto grid grid-cols-1 gap-3 border-t-[2.5px] border-dashed border-line p-5 min-[22rem]:grid-cols-[1.4fr_1fr]">
         <a
           href={casino.attachment.affiliate_url}
